@@ -3,37 +3,27 @@
             [reagent.core :as r]
             [semantic-ui-demo.subs :as subs]
             cljsjs.semantic-ui-react
-            goog.object))
-
-(def semantic-ui js/semanticUIReact)
-(defn component
-  "Get a component from sematic-ui-react:
-
-    (component \"Button\")
-    (component \"Menu\" \"Item\")"
-  [k & ks]
-  (if (seq ks)
-    (apply goog.object/getValueByKeys semantic-ui k ks)
-    (goog.object/get semantic-ui k)))
-
-#_(def button (goog.object/get semantic-ui "Button"))
-(def button (aget semantic-ui "Button"))
-(def menu-item (goog.object/getValueByKeys semantic-ui "Menu" "Item"))
-
-(def Button (r/adapt-react-class (aget semantic-ui "Button")))
+            [cljs.reader :as reader]
+            [semantic-ui-demo.events :as events]))
 
 (def sui js/semanticUIReact)
 
-#_(defn navbar []
-  (let [state (r/atom {})]
-    (fn []
-      [:div
-       [:> sui.Responsive ]])))
+(defn header []
+  [:> sui.Menu {:inverted true}
+   [:> sui.Container
+    [:> sui.Menu.Item {:as "a" :header true :link true :href "/#simple-react"} "Semantic UI Demo"]
+    [:> sui.Menu.Item {:as "a" :link true :href "/#simple"} "Home"]
+    [:> sui.Dropdown {:item true :text "Dropdown"}
+     [:> sui.Dropdown.Menu
+      [:> sui.Dropdown.Item {:value (pr-str [::events/set-active-panel :simple-sui-panel])
+                             :onClick #(-> %2 (aget "value") reader/read-string rf/dispatch)} "Simple"]
+      [:> sui.Dropdown.Item {:value (pr-str [::events/set-active-panel :simple-sui-react-panel])
+                             :onClick #(-> %2 (aget "value") reader/read-string rf/dispatch)} "Simple React"]]]]])
 
 
 (defn simple-sui-panel []
   [:div
-   [:h4.ui.header "Simple Semantic UI Panel"]
+   [:h1.ui.header "Simple Semantic UI Panel"]
    [:a.ui.primary.button "Primary Brand Color"]
    [:a.ui.secondary.button "Secondary Brand Color"]
    [:div.ui.five.column.stackable.padded.grid
@@ -79,7 +69,7 @@
 
 (defn simple-sui-react-panel []
   [:div
-   [:> sui.Header {:as :h4 :content "Simple Semantic UI React Panel"}]
+   [:> sui.Header {:as :h1 :content "Simple Semantic UI React Panel"}]
    [:> sui.Button {:size :small :color :green}
     [:> sui.Icon {:name :download}] "Download"]
    [:> sui.Message {:success true :icon "thumbs up" :header "Nice job!" :content "Your profile is complete."}]
@@ -119,8 +109,8 @@
     [:div
      [:div
       (str "Hello from " @name ". This is the Home Page.")
-      [:> button {:onClick #(js/alert "yo")} "Click"]
-      [Button {:on-click #(js/alert "yowsa!")} "Click"]
+      #_[:> button {:onClick #(js/alert "yo")} "Click"]
+      #_[Button {:on-click #(js/alert "yowsa!")} "Click"]
       [:> sui.Button {:on-click #(js/alert "yowsa!!")} "Click!!"]
 
       [:div [:a {:href "#/about"} "go to About Page"]]
@@ -145,4 +135,7 @@
 
 (defn main-panel []
   (let [active-panel (rf/subscribe [::subs/active-panel])]
-    [show-panel @active-panel]))
+    [:div
+     [header]
+     [:> sui.Container {:text true :style {:marginTop "2em"}}
+      [show-panel @active-panel]]]))
