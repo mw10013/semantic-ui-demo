@@ -13,12 +13,21 @@
    [:> sui.Container
     [:> sui.Menu.Item {:as "a" :header true :link true :href "/#simple-react"} "Semantic UI Demo"]
     [:> sui.Menu.Item {:as "a" :link true :href "/#simple"} "Home"]
-    [:> sui.Dropdown {:item true :text "Dropdown"}
+    [:> sui.Dropdown {:item true :simple true :text "Dropdown"}
      [:> sui.Dropdown.Menu
       [:> sui.Dropdown.Item {:value (pr-str [::events/set-active-panel :simple-sui-panel])
                              :onClick #(-> %2 (aget "value") reader/read-string rf/dispatch)} "Simple"]
       [:> sui.Dropdown.Item {:value (pr-str [::events/set-active-panel :simple-sui-react-panel])
-                             :onClick #(-> %2 (aget "value") reader/read-string rf/dispatch)} "Simple React"]]]]])
+                             :onClick #(-> %2 (aget "value") reader/read-string rf/dispatch)} "Simple React"]
+      [:> sui.Dropdown.Divider]
+      [:> sui.Dropdown.Item
+       [:i.dropdown.icon]
+       [:span.text "Submenu"]
+       [:> sui.Dropdown.Menu
+        [:> sui.Dropdown.Item {:value   (pr-str [::events/set-active-panel :simple-sui-panel])
+                               :onClick #(-> %2 (aget "value") reader/read-string rf/dispatch)} "Simple"]
+        [:> sui.Dropdown.Item {:value   (pr-str [::events/set-active-panel :simple-sui-react-panel])
+                               :onClick #(-> %2 (aget "value") reader/read-string rf/dispatch)} "Simple React"]]]]]]])
 
 
 (defn simple-sui-panel []
